@@ -345,6 +345,7 @@ class _ForgotPasswordPage extends State<ForgotPasswordPage> {
   }
 
   Future checkToken() async {
+    print("Inside check token");
     // String userName = validateForgotPasswordToken(token, refId)(userNameController.text);
     var res = await http.get(
       validateForgotPasswordToken(verifyToken.text, referenceId),
@@ -363,8 +364,13 @@ class _ForgotPasswordPage extends State<ForgotPasswordPage> {
 
       _currentStep < 2 ? setState(() => _currentStep += 1) : null;
     } else if (res.statusCode == 406) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text("Invalid token please check again."),
+      ));
     } else {
-      print("Registration failed");
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text("Invalid token please check again."),
+      ));
       print(res.statusCode);
       print(res.body);
       setState(() {

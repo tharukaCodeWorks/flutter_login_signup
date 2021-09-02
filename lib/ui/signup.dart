@@ -10,6 +10,7 @@ import 'package:flutter_login_signup/ui/Widget/bezierContainer.dart';
 import 'package:flutter_login_signup/ui/loginPage.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 
 class SignUpPage extends StatefulWidget {
   SignUpPage({Key key, this.title}) : super(key: key);
@@ -20,10 +21,16 @@ class SignUpPage extends StatefulWidget {
   _SignUpPageState createState() => _SignUpPageState();
 }
 
+const spinkit = SpinKitCircle(
+  color: Colors.white,
+  size: 25.0,
+);
+
 class _SignUpPageState extends State<SignUpPage> {
   final _personal1 = GlobalKey<FormState>();
   final _personal2 = GlobalKey<FormState>();
   final _account = GlobalKey<FormState>();
+  bool loadingInprogress = false;
 
   TextEditingController userNameController = TextEditingController();
   TextEditingController referalCodeController = TextEditingController();
@@ -213,10 +220,12 @@ class _SignUpPageState extends State<SignUpPage> {
                   begin: Alignment.centerLeft,
                   end: Alignment.centerRight,
                   colors: [Color(0xff6d6bff), Color(0xff4d4cb2)])),
-          child: Text(
-            'Register Now',
-            style: TextStyle(fontSize: 20, color: Colors.white),
-          ),
+          child: loadingInprogress
+              ? spinkit
+              : Text(
+                  'Register Now',
+                  style: TextStyle(fontSize: 20, color: Colors.white),
+                ),
         ));
   }
 
@@ -390,7 +399,9 @@ class _SignUpPageState extends State<SignUpPage> {
   }
 
   Future generateToken({BuildContext buildcontext}) async {
-    print("Login process running");
+    setState(() {
+      loadingInprogress = true;
+    });
     var res = await http.post("$LOGIN", body: {
       "clientId": CLIENT_ID,
       "clientSecret": API_CLIENT_TOKEN,
@@ -460,10 +471,13 @@ class _SignUpPageState extends State<SignUpPage> {
               ModalRoute.withName("/Login")));
     } else if (res.statusCode == 406) {
     } else {
-      print("Registration failed");
-      print(res.statusCode);
-      print(res.body);
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text("Registration failed please try again."),
+      ));
     }
+    setState(() {
+      loadingInprogress = false;
+    });
   }
 
   @override

@@ -10,6 +10,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'Widget/bezierContainer.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 
 class LoginPage extends StatefulWidget {
   LoginPage({Key key, this.title}) : super(key: key);
@@ -20,11 +21,17 @@ class LoginPage extends StatefulWidget {
   _LoginPageState createState() => _LoginPageState();
 }
 
+const spinkit = SpinKitCircle(
+  color: Colors.white,
+  size: 25.0,
+);
+
 class _LoginPageState extends State<LoginPage> {
   final _formKey = GlobalKey<FormState>();
   TextEditingController emailController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
   final storage = new FlutterSecureStorage();
+  bool loadingInprogress = false;
 
   Widget _backButton() {
     return InkWell(
@@ -113,10 +120,12 @@ class _LoginPageState extends State<LoginPage> {
                   begin: Alignment.centerLeft,
                   end: Alignment.centerRight,
                   colors: [Color(0xff6d6bff), Color(0xff4d4cb2)])),
-          child: Text(
-            'Login',
-            style: TextStyle(fontSize: 20, color: Colors.white),
-          ),
+          child: loadingInprogress
+              ? spinkit
+              : Text(
+                  'Login',
+                  style: TextStyle(fontSize: 20, color: Colors.white),
+                ),
         ));
   }
 
@@ -182,7 +191,9 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   Future<String> attemptLogIn() async {
-    print("Login process running");
+    setState(() {
+      loadingInprogress = true;
+    });
     var res = await http.post("$LOGIN", body: {
       "username": emailController.text,
       "password": passwordController.text,
@@ -212,8 +223,9 @@ class _LoginPageState extends State<LoginPage> {
         content: Text("Please try again!"),
       ));
     }
-    // print(res.body);
-    // return res.body;
+    setState(() {
+      loadingInprogress = false;
+    });
     return null;
   }
 
