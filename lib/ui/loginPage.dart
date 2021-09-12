@@ -210,9 +210,10 @@ class _LoginPageState extends State<LoginPage> {
       await storage.write(
           key: 'refreshToken', value: loginResponse.responseBody.refreshToken);
       Navigator.pushAndRemoveUntil(
-          context,
-          MaterialPageRoute(builder: (context) => HomePage()),
-          ModalRoute.withName("/Home"));
+        context,
+        MaterialPageRoute(builder: (context) => HomePage()),
+        (route) => false,
+      );
       // print(loginResponse.responseBody.accessToken);
     } else if (res.statusCode == 406) {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(

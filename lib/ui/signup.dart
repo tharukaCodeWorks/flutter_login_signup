@@ -72,6 +72,7 @@ class _SignUpPageState extends State<SignUpPage> {
 
   Widget _entryField(String title, TextEditingController textEditingController,
       {bool isPassword = false,
+      bool isBirthDay = false,
       bool isEmail = false,
       BuildContext buildContext,
       bool enable = true,
@@ -99,6 +100,22 @@ class _SignUpPageState extends State<SignUpPage> {
                   return 'Password must contain 1 uppercase, lowercase, numeric, special char';
                 } else if (isEmail && !isValidEmail(value)) {
                   return 'Please enter valid email address';
+                }
+                if (isBirthDay) {
+                  print("Inside Date Validator");
+                  var now =
+                      new DateTime.now().subtract(const Duration(days: 365));
+                  List<String> splittedDate = birthDay.text.split("-");
+                  print(splittedDate);
+                  var selectedBirthDay = new DateTime.utc(
+                      int.parse(splittedDate[0]),
+                      int.parse(splittedDate[1]),
+                      int.parse(splittedDate[2]));
+                  print(selectedBirthDay);
+                  // 0 denotes being equal positive value greater and negative value being less
+                  if (selectedBirthDay.compareTo(now) > 0) {
+                    return 'You must be over 10 years old';
+                  }
                 }
                 return null;
               },
@@ -307,7 +324,10 @@ class _SignUpPageState extends State<SignUpPage> {
     return Column(
       children: <Widget>[
         _entryField("Birthday", birthDay,
-            buildContext: buildContext, enable: false, onTap: _selectDate),
+            buildContext: buildContext,
+            enable: false,
+            onTap: _selectDate,
+            isBirthDay: true),
         // _entryField("Country"),
         _countrySelectField("Country"),
         _entryField("Contact Number", contactNumber),
